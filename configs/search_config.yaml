@@ -1,0 +1,5 @@
+all_words_path: "data/all_words.json"
+alphabet_path: "data/alph.json"
+professions_corpus_path: "data/prof_corpus.json"
+translations_path: "data/translations.json"
+vectorizer_path: "models/tfidfvectorizer.pkl"
