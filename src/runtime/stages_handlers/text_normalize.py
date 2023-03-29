@@ -18,6 +18,7 @@ class TextNormHandler:
 
 
     def prepare_text(self, text: str) -> list[str]:
+        print(text)
         text = text.lower()
         # Удаление тегов
         pattern = r'<([/a-z\s]+)>'

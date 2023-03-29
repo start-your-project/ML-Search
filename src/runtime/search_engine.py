@@ -17,6 +17,8 @@ class SearchEngine:
         text = self.translit_h.add_translit(text)
         # Обработка опечаток
         text = self.corrections_h.apply(text)
+        if not text:
+            return "NAN"
         # Векторизация TF-IDF
         vec = self.vectorizer.vectorize([" ".join(text)])
         # Ранжирование

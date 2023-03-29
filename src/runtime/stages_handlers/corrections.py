@@ -7,12 +7,13 @@ dist_lev_vec = np.vectorize(Levenshtein.distance)
 @dataclass()
 class CorrectionHandler:
     all_words: np.ndarray[str]
+    max_d: int = 3
 
     def get_closest(self, word: str) -> Union[str, None]:
         top_n = 20
         dist_all = dist_lev_vec(word, self.all_words)
         dist = dist_all.min()
-        if dist > 10 or dist > len(word) // 2:
+        if dist > self.max_d or dist > len(word) // 2:
             return None
 
         index = dist_all.argmin()

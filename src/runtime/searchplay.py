@@ -34,6 +34,6 @@ if __name__ == '__main__':
 
     search_engine = get_search_engine(data_paths)
 
-    text = "девопс"
-
-    print(search_engine.search(text))
+    while True:
+        text = input()
+        print(search_engine.search(text))
