@@ -11,7 +11,7 @@ Run docker container :
    ```commandline
    docker run -p 8000:8000 searchplay
    ```
-Go to http://127.0.0.1:8000/ to see if the search engine is ready.
+Go to http://0.0.0.0:8000/ to see if the search engine is ready.
 
 Making HTTP GET requests examples
  - http://127.0.0.1:8000/search/python -> `{"profession":"python developer"}`
