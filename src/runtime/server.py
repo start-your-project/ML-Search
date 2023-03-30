@@ -1,7 +1,7 @@
 from pydantic import BaseModel
+import os
 from fastapi import FastAPI
 from .searchplay import get_search_engine
-#from .search_engine import SearchEngine
 from src.data import read_data_paths_params
 
 class Query(BaseModel):
@@ -9,12 +9,12 @@ class Query(BaseModel):
 
 app = FastAPI()
 SEARCH_ENGINE = None
-CONFIG_PATH = "configs/search_config.yaml"
 
 @app.on_event("startup")
 def load_search_engine():
-    global SEARCH_ENGINE, CONFIG_PATH
-    data_paths = read_data_paths_params(CONFIG_PATH)
+    global SEARCH_ENGINE
+    config_path = os.getenv("SEARCH_CONFIG_PATH")
+    data_paths = read_data_paths_params(config_path)
     SEARCH_ENGINE = get_search_engine(data_paths)
 
 
