@@ -14,5 +14,5 @@ Run docker container :
 Go to http://0.0.0.0:8000/ to see if the search engine is ready.
 
 Making HTTP GET requests examples
- - http://127.0.0.1:8000/search/python -> `{"profession":"python developer"}`
- - http://127.0.0.1:8000/search/тупой%20запрос -> `{"profession":"NAN"}`
+ - http://0.0.0.0:8000/search/python -> `{"profession":"python developer"}`
+ - http://0.0.0.0:8000/search/тупой%20запрос -> `{"profession":"NAN"}`
