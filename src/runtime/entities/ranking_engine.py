@@ -17,8 +17,6 @@ class RankingEngine:
         self.corpus_vec = vectorizer.vectorize(self.corpus)
         self.dist_func = sim_metric
         self.mask = np.ones(len(prof_corpus))
-        self.mask[13] = 0
-        self.mask[26] = 0
         self.n_prof = len(self.professions)
 
     def get_distance(self, vec: np.ndarray):
