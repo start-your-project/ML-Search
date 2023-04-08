@@ -3,12 +3,13 @@ import os
 from fastapi import FastAPI
 from .searchplay import get_search_engine
 from src.data import read_data_paths_params
+from.search_engine import SearchEngine
 
 class Query(BaseModel):
     query: str
 
 app = FastAPI()
-SEARCH_ENGINE = None
+SEARCH_ENGINE : SearchEngine
 
 @app.on_event("startup")
 def load_search_engine():
@@ -24,9 +25,14 @@ async def root():
 
 
 @app.get("/search/{query}")
-async def root(query: str):
+async def search(query: str):
     profession = SEARCH_ENGINE.search(query)
     return {"profession": profession}
+
+@app.get("/recommend/{query}")
+async def recommend(query: str, n: int = 5):
+    professions = SEARCH_ENGINE.recommend(query, n)
+    return {"professions": professions}
 
 
 
