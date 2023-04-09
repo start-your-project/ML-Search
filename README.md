@@ -9,7 +9,7 @@ docker build -t searchplay .
 ```
 Run docker container :
    ```commandline
-   docker run -p -d 8000:8000 searchplay
+   docker run -d -p 8000:8000 searchplay
    ```
 Go to http://0.0.0.0:8000/ to see if the search engine is ready.
 
