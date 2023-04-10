@@ -43,7 +43,7 @@ async def recommend(query: str, n: int = 5):
 async def get_data(cv: CV) -> Recommend:
     # Waits for the request and converts into JSON
     raw_text = cv.cv_text
-    rec = get_recommendation_cv(raw_text, cv.n_tech)
+    rec = get_recommendation_cv(raw_text, cv.n_prof, cv.n_tech)
     return Recommend(recommend=rec)
 
 

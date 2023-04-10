@@ -7,6 +7,7 @@ from collections import defaultdict
 class CV(BaseModel):
     cv_text: str
     n_tech: int = 10
+    n_prof: int = 7
 
 class Recommend(BaseModel):
     recommend: list[dict]
@@ -83,7 +84,7 @@ def get_to_learn(text_cv: str, prof: str, n: int = 5) -> list[str]:
 
     return result
 
-def get_recommendation_cv(raw_text: str, n_techs: int = 10) -> list[dict]:
+def get_recommendation_cv(raw_text: str,  n_prof: int, n_techs: int = 10) -> list[dict]:
     text_cv = get_clean_text(raw_text)
 
     with conn.cursor() as cursor:
@@ -115,7 +116,7 @@ def get_recommendation_cv(raw_text: str, n_techs: int = 10) -> list[dict]:
 
         closed_prof = sorted(cv_sim_pos.items(), key=lambda p: p[1], reverse=True)
 
-        for prof, prc in closed_prof[:7]:
+        for prof, prc in closed_prof[:n_prof]:
             res_tmp = {
                 "profession": beauty_name_pos[prof],
                 "simularity": prc,
