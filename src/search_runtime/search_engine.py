@@ -3,8 +3,8 @@ from typing import Union
 
 import numpy as np
 
-from src.runtime.stages_handlers import TranslitHandler, CorrectionHandler, TextNormHandler
-from src.runtime.entities import TfIdfModel, RankingEngine
+from src.search_runtime.stages_handlers import TranslitHandler, CorrectionHandler, TextNormHandler
+from src.search_runtime.entities import TfIdfModel, RankingEngine
 
 @dataclass()
 class SearchEngine:

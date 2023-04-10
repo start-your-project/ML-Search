@@ -6,12 +6,12 @@ from src.data import (
     load_json,
     load_pickle
 )
-from src.runtime.stages_handlers import (
+from src.search_runtime.stages_handlers import (
     TextNormHandler,
     CorrectionHandler,
     TranslitHandler
 )
-from src.runtime.entities import RankingEngine
+from src.search_runtime.entities import RankingEngine
 
 
 CONFIG_PATH = "configs/search_config.yaml"
