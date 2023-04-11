@@ -125,4 +125,4 @@ def get_recommendation_cv(raw_text: str,  n_prof: int, n_techs: int = 10) -> lis
             }
             result.append(res_tmp)
 
-        return result
+    return result
