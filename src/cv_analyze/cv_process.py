@@ -59,7 +59,7 @@ cv_sim_pos = dict()
 #TEXT_CV = " machine learning engineer ++ developer + github com superaiyah fedorx safonovfedya gmail com codeforces fedorx moscow russia gpa c++ image meda center gui wxwidgets astra linux cmake vk ml ml c c++ dl school cnn alexnet vgg resnet densenet inseption segnet u net rcnn vae cvae java java git + gif code review tinkoff b online alias c++ alias online uml qt youtube best data science + c++ ii ii python numpy pandas matplotlib seaborn pytorch catboost scikit learn aiogram unittest ++ gtest cmake qt wxwidgets java linux sql ms sql mysql git ci cd team work "
 
 def get_learned(text_cv: str, prof: str, n: int = 5) -> list[str]:
-    techs = role_tech[prof]
+    techs = set(role_tech[prof])
     result = []
 
     for tech_p in techs:
@@ -69,10 +69,10 @@ def get_learned(text_cv: str, prof: str, n: int = 5) -> list[str]:
             if len(result) == n:
                 break
 
-    return result
+    return list(set(result))
 
 def get_to_learn(text_cv: str, prof: str, n: int = 5) -> list[str]:
-    techs = role_tech[prof]
+    techs = set(role_tech[prof])
     result = []
 
     for tech_p in techs:
@@ -82,7 +82,7 @@ def get_to_learn(text_cv: str, prof: str, n: int = 5) -> list[str]:
             if len(result) == n:
                 break
 
-    return result
+    return list(set(result))
 
 def get_recommendation_cv(raw_text: str,  n_prof: int, n_techs: int = 10) -> list[dict]:
     text_cv = get_clean_text(raw_text)
@@ -94,7 +94,7 @@ def get_recommendation_cv(raw_text: str,  n_prof: int, n_techs: int = 10) -> lis
         for elem in cursor:
             row = Row(*elem)
             clean_position = get_clean_text(row.name_position)
-            if clean_position == "c developer":
+            if clean_position == "c developer" or clean_position == "c# developer":
                 continue
             clean_technolohy = get_clean_text(row.name_technology)
             if not clean_technolohy or has_rus(row.name_technology):
