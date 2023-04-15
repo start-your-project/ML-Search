@@ -27,8 +27,6 @@ class SearchEngine:
         vec = self.vectorizer.vectorize([" ".join(text)])
         # Ранжирование
         sim_dist = self.ranking_engine.get_distance(vec)
-        # Евристики
-        sim_dist = self.ranking_engine.text_match_evr(text_in, sim_dist)
         return sim_dist
 
     def search(self, text_in: str) -> str:

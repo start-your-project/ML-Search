@@ -19,16 +19,23 @@ class RankingEngine:
         self.mask = np.ones(len(prof_corpus))
         self.n_prof = len(self.professions)
 
+        self.ban_list = np.array([56, 72])
+        self.mask[self.ban_list] = 0
+
     def get_distance(self, vec: np.ndarray):
-        simularity_dist = self.dist_func(vec, self.corpus_vec) * self.mask
+        simularity_dist = self.dist_func(vec, self.corpus_vec)
         return simularity_dist[0]
 
     def text_match_evr(self, text_in: str, matr: np.ndarray):
+        return matr
         new_matr = copy.deepcopy(matr)
         if len(text_in) > 5:
             for i in range(self.n_prof):
                 new_matr[i] += 1 / max(Levenshtein.distance(text_in, self.professions[i]), 1)
         return new_matr
+
+    def apply_ban_list(self, dist: np.ndarray):
+        return dist * self.mask
 
     def get_result(self, sim_dist: np.ndarray):
         return self.professions[sim_dist.argmax()]

@@ -18,7 +18,6 @@ class TextNormHandler:
 
 
     def prepare_text(self, text: str) -> list[str]:
-        print(text)
         text = text.lower()
         # Удаление пунктуации
         text = re.sub("[^0-9A-Za-zа-яА-ЯЁё\+# ]", " ", text)
@@ -26,8 +25,6 @@ class TextNormHandler:
         rus = nltk.corpus.stopwords.words('russian')
         eng = nltk.corpus.stopwords.words('english')
         text = " ".join([elem for elem in text.split() if elem not in rus and elem not in eng])
-        print(f"after del stopwords :{text}")
         # Лемматизация
         text = self.lemmatize(text)
-        print(f"after lemmatize :{text}")
         return text.split()
