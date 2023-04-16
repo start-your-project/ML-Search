@@ -32,7 +32,7 @@ class SearchEngine:
     def search(self, text_in: str) -> str:
         sim_dist = self.get_distance(text_in)
         if sim_dist is None:
-            return "NAN"
+            return ""
         # Выбираем топ 1 профессию
         result = self.ranking_engine.get_result(sim_dist)
         return result
