@@ -16,11 +16,15 @@ Go to http://0.0.0.0:8000/ to see if the search engine is ready.
 Making HTTP GET requests examples
 
 Search:
- - http://0.0.0.0:8000/search/python -> `{"profession":"python developer"}`
- - http://0.0.0.0:8000/search/тупой%20запрос -> `{"profession":"NAN"}`
+ - http://0.0.0.0:8000/role_search/python -> `{"profession":"python developer"}`, *status 200*
+ - http://0.0.0.0:8000/role_search/тупой%20запрос -> `{"detail":"Nothing was found"}`, *status 404*
 
-Reccommend system:
-- http://0.0.0.0:8000/recommend/c -> `{"professions":["c# developer","c++ developer","c developer","mlops","ml researcher"]}`
-- http://0.0.0.0:8000/recommend/docker?n=3 -> `{"professions":["devops","MongoDB","mlops"]}`
+Role hints:
+- http://0.0.0.0:8000/recommend/c -> `{"professions":["c# developer","c++ developer","c developer","mlops","ml researcher"]}`, *status 200*
+- http://0.0.0.0:8000/recommend/docker?n=3 -> `{"professions":["devops","MongoDB","mlops"]}`, *status 200*
 
+CV_analyze for profession: ...
 
+Technoloy hints: ...
+
+**Swagger for full API documentation:** http://0.0.0.0:8000/docs.
