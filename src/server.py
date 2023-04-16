@@ -17,7 +17,7 @@ class Query(BaseModel):
 app = FastAPI()
 SEARCH_ENGINE: SearchEngine
 CONNECTION_POOL: SimpleConnectionPool
-API_PREFIX = "api/v3"
+API_PREFIX = "/api/v3"
 
 
 @app.on_event("startup")
