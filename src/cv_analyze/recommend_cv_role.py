@@ -109,15 +109,3 @@ def get_recommend_cv(input_cv: str, role: str, n: int, postgres_pool: SimpleConn
         "learned": known_techs,
         "to learn": to_know_techs
     }])
-
-'''
-{
-  "cv_text": "machine learning engineer ++ developer + github com superaiyah fedorx safonovfedya gmail com codeforces fedorx moscow russia gpa c++ image meda center gui wxwidgets astra linux cmake vk ml ml c c++ dl school cnn alexnet vgg resnet densenet inseption segnet u net rcnn vae cvae java java git + gif code review tinkoff b online alias c++ alias online uml qt youtube best data science + c++ ii ii python numpy pandas matplotlib seaborn pytorch catboost scikit learn aiogram unittest ++ gtest cmake qt wxwidgets java linux sql ms sql mysql git ci cd team work",
-  "role": "ML Researcher",
-  "n_tech": 10
-}
-'''
-
-
-
-

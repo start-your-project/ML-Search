@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from .search_runtime.searchplay import get_search_engine
 from .search_runtime.search_engine import SearchEngine
 from .cv_analyze.recommend_cv_role import Recommend, CV, get_recommend_cv
+from .backward_search.recommend import get_recommend_tech
 from src.data import read_data_paths_params
 
 
@@ -52,6 +53,12 @@ async def search(query: str) -> dict[str, str]:
     if not profession:
         raise HTTPException(status_code=404, detail="Nothing was found")
     return {"profession": profession}
+
+
+@app.get("/backward_search/{query}")
+async def backward_search(query: str, n:int = 5) -> dict[str, list[str]]:
+    result = get_recommend_tech(query, n, CONNECTION_POOL)
+    return {"techs": result}
 
 
 @app.get("/recommend/{query}")
