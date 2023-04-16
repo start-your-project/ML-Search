@@ -47,7 +47,7 @@ async def root():
     return "Search service by @FedorX8"
 
 
-@app.get("/search/{query}")
+@app.get("/role_search/{query}")
 async def search(query: str) -> dict[str, str]:
     profession = SEARCH_ENGINE.search(query)
     if not profession:
@@ -55,7 +55,7 @@ async def search(query: str) -> dict[str, str]:
     return {"profession": profession}
 
 
-@app.get("/backward_search/{query}")
+@app.get("/tech_search/{query}")
 async def backward_search(query: str, n:int = 5) -> dict[str, list[str]]:
     result = get_recommend_tech(query, n, CONNECTION_POOL)
     return {"techs": result}
