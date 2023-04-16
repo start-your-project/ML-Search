@@ -17,6 +17,7 @@ class Query(BaseModel):
 app = FastAPI()
 SEARCH_ENGINE: SearchEngine
 CONNECTION_POOL: SimpleConnectionPool
+API_PREFIX = "api/v3"
 
 
 @app.on_event("startup")
@@ -47,7 +48,7 @@ async def root():
     return "Search service by @FedorX8"
 
 
-@app.get("/role_search/{query}")
+@app.get(API_PREFIX+"/role_search/{query}")
 async def search(query: str) -> dict[str, str]:
     profession = SEARCH_ENGINE.search(query)
     if not profession:
@@ -55,13 +56,13 @@ async def search(query: str) -> dict[str, str]:
     return {"profession": profession}
 
 
-@app.get("/tech_search/{query}")
+@app.get(API_PREFIX+"/tech_search/{query}")
 async def backward_search(query: str, n:int = 5) -> dict[str, list[str]]:
     result = get_recommend_tech(query, n, CONNECTION_POOL)
     return {"techs": result}
 
 
-@app.get("/recommend/{query}")
+@app.get(API_PREFIX+"/recommend/{query}")
 async def recommend(query: str, n: int = 5) -> dict[str, list[str]]:
     professions = SEARCH_ENGINE.recommend(query, n)
     if not professions:
@@ -69,7 +70,7 @@ async def recommend(query: str, n: int = 5) -> dict[str, list[str]]:
     return {"professions": professions}
 
 
-@app.post("/cv_analyze")
+@app.post(API_PREFIX+"/cv_analyze")
 async def get_cv_recommendation(cv: CV) -> Recommend:
     result = get_recommend_cv(cv.cv_text, cv.role, cv.n_tech, CONNECTION_POOL)
     if result.empty():
