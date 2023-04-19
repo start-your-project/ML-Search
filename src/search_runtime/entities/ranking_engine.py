@@ -16,8 +16,9 @@ class RankingEngine:
         self.mask = np.ones(len(prof_corpus))
         self.n_prof = len(self.professions)
 
-        self.ban_list = np.array([56, 72])
-        self.mask[self.ban_list] = 0
+        self.ban_list = np.array([])
+        if (self.ban_list):
+            self.mask[self.ban_list] = 0
 
     def get_distance(self, vec: np.ndarray):
         simularity_dist = self.dist_func(vec, self.corpus_vec)
