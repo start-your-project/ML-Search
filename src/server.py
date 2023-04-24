@@ -18,7 +18,7 @@ app = FastAPI()
 SEARCH_ENGINE: SearchEngine
 CONNECTION_POOL: SimpleConnectionPool
 API_PREFIX = "/api/v3"
-THRESHOLD = 0.07
+THRESHOLD = 0.08
 
 
 @app.on_event("startup")

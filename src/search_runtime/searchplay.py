@@ -25,7 +25,11 @@ def get_api_json(req):
 def check_possible_prof(prof: str) -> bool:
     query = f"https://api.hh.ru/vacancies?text={prof}&per_page=10&page=0"
     result = get_api_json(query)
-    return len(result['items']) == 10
+    if 'items' in result:
+        return len(result['items']) == 10
+    else:
+        print(result)
+        return len(result['items']) == 10
 
 
 def get_search_engine(data_paths: DataPaths, threshold: float) -> SearchEngine:

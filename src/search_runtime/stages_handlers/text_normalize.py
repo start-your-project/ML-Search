@@ -27,4 +27,5 @@ class TextNormHandler:
         text = " ".join([elem for elem in text.split() if elem not in rus and elem not in eng])
         # Лемматизация
         text = self.lemmatize(text)
+        print(f"INPUT_TEXT:{text}")
         return text.split()
