@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.pool import SimpleConnectionPool
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
-from .search_runtime.searchplay import get_search_engine
+from .search_runtime.searchplay import get_search_engine, check_possible_prof
 from .search_runtime.search_engine import SearchEngine
 from .cv_analyze.recommend_cv_role import Recommend, CV, get_recommend_cv
 from .backward_search.recommend import get_recommend_tech
@@ -18,6 +18,7 @@ app = FastAPI()
 SEARCH_ENGINE: SearchEngine
 CONNECTION_POOL: SimpleConnectionPool
 API_PREFIX = "/api/v3"
+THRESHOLD = 0.07
 
 
 @app.on_event("startup")
@@ -25,7 +26,7 @@ def load_search_engine():
     global SEARCH_ENGINE
     config_path = os.getenv("SEARCH_CONFIG_PATH")
     data_paths = read_data_paths_params(config_path)
-    SEARCH_ENGINE = get_search_engine(data_paths)
+    SEARCH_ENGINE = get_search_engine(data_paths, THRESHOLD)
     print("SEARCH ENGINE is initialized")
 
 
@@ -35,7 +36,7 @@ def get_connection_pool():
     CONNECTION_POOL = psycopg2.pool.SimpleConnectionPool(1, 10,
                                                          user="docker",
                                                          password="docker",
-                                                         host="89.208.85.17",
+                                                         host="51.250.86.4",
                                                          port="5432")
     if CONNECTION_POOL:
         print("CONNECTION POOL is initialized")
@@ -52,8 +53,10 @@ async def root():
 async def search(query: str) -> dict[str, str]:
     profession = SEARCH_ENGINE.search(query)
     if not profession:
+        if check_possible_prof(query):
+            return {"profession": query, "in_base": False}
         raise HTTPException(status_code=404, detail="Nothing was found")
-    return {"profession": profession}
+    return {"profession": profession, "in_base": True}
 
 
 @app.get(API_PREFIX+"/tech_search/{query}")

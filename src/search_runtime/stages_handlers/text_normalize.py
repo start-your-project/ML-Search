@@ -20,7 +20,7 @@ class TextNormHandler:
     def prepare_text(self, text: str) -> list[str]:
         text = text.lower()
         # Удаление пунктуации
-        text = re.sub("[^0-9A-Za-zа-яА-ЯЁё\+# ]", " ", text)
+        text = re.sub("[^0-9A-Za-zа-яА-ЯЁё\d\+# ]", " ", text)
         # Stop words
         rus = nltk.corpus.stopwords.words('russian')
         eng = nltk.corpus.stopwords.words('english')

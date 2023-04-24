@@ -28,7 +28,7 @@ class RankingEngine:
         return dist * self.mask
 
     def get_result(self, sim_dist: np.ndarray):
-        return self.professions[sim_dist.argmax()]
+        return self.professions[sim_dist.argmax()], sim_dist.max()
 
     def top_n(self, sim_dist: np.ndarray, n: int = 5):
         n = min(n, len(sim_dist))

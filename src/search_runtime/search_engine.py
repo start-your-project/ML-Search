@@ -13,6 +13,7 @@ class SearchEngine:
     corrections_h: CorrectionHandler
     vectorizer: TfIdfModel
     ranking_engine: RankingEngine
+    threshold: float
 
     def get_distance(self, text_in: str) -> Union[np.ndarray, None]:
         # Нормализация
@@ -34,7 +35,10 @@ class SearchEngine:
         if sim_dist is None:
             return ""
         # Выбираем топ 1 профессию
-        result = self.ranking_engine.get_result(sim_dist)
+        result, val = self.ranking_engine.get_result(sim_dist)
+        print(f"result={result}, value={val}")
+        if val < self.threshold:
+            return ""
         return result
 
     def recommend(self, text_in: str, n) -> list[str]:
