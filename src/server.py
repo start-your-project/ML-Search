@@ -54,9 +54,9 @@ async def search(query: str) -> dict[str, str]:
     profession = SEARCH_ENGINE.search(query)
     if not profession:
         if check_possible_prof(query):
-            return {"profession": query, "in_base": False}
+            return {"profession": query, "in_base": 0}
         raise HTTPException(status_code=404, detail="Nothing was found")
-    return {"profession": profession, "in_base": True}
+    return {"profession": profession, "in_base": 1}
 
 
 @app.get(API_PREFIX+"/tech_search/{query}")
