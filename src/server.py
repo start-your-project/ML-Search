@@ -5,7 +5,8 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from .search_runtime.searchplay import get_search_engine, check_possible_prof
 from .search_runtime.search_engine import SearchEngine
-from .cv_analyze.recommend_cv_role import Recommend, CV, get_recommend_cv
+from .cv_analyze.recommend_cv_role import Recommend, CV, get_recommend
+from .cv_analyze.load_data import load_synonyms, load_freq
 from .backward_search.recommend import get_recommend_tech
 from src.data import read_data_paths_params
 
@@ -17,6 +18,8 @@ class Query(BaseModel):
 app = FastAPI()
 SEARCH_ENGINE: SearchEngine
 CONNECTION_POOL: SimpleConnectionPool
+TECH_SYN = {}  # bad_name -> good name
+ROLE_TECH_FREQ = {}
 API_PREFIX = "/api/v3"
 THRESHOLD = 0.08
 
@@ -42,6 +45,13 @@ def get_connection_pool():
         print("CONNECTION POOL is initialized")
     else:
         print("CONNECTION POOL initialization ERROR")
+
+
+@app.on_event("startup")
+def load_syn():
+    global TECH_SYN, ROLE_TECH_FREQ
+    TECH_SYN = load_synonyms(CONNECTION_POOL)
+    ROLE_TECH_FREQ = load_freq(CONNECTION_POOL, TECH_SYN)
 
 
 @app.get("/")
@@ -75,7 +85,8 @@ async def recommend(query: str, n: int = 5) -> dict[str, list[str]]:
 
 @app.post(API_PREFIX+"/cv_analyze")
 async def get_cv_recommendation(cv: CV) -> Recommend:
-    result = get_recommend_cv(cv.cv_text, cv.role, cv.n_tech, CONNECTION_POOL)
+    #result = get_recommend_cv(cv.cv_text, cv.role, cv.n_tech, CONNECTION_POOL)
+    result = get_recommend(cv.cv_text, cv.role, cv.n_tech, TECH_SYN, ROLE_TECH_FREQ)
     if result.empty():
         raise HTTPException(status_code=404, detail="No such role")
     return result

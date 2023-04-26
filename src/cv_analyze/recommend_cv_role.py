@@ -37,7 +37,7 @@ def has_rus(text: str) -> bool:
 
 
 def get_clean_text(text: str) -> str:
-    text = re.sub("[^0-9A-Za-zа-яА-ЯЁё\+# ]", " ", text)
+    text = re.sub("[^0-9A-Za-zа-яА-ЯЁё\d\+# ]", " ", text)
     text = re.sub("\s+", " ", text).strip().lower()
     return text
 
@@ -80,8 +80,68 @@ def get_to_learn(cv_words: list[str], techs: list[tuple[str, float]], n: int = 5
     return techs[:n]
 
 
-def get_recommend_cv(input_cv: str, role: str, n: int, postgres_pool: SimpleConnectionPool) -> Recommend:
-    cv_words = get_clean_text(input_cv).split()
+def get_recommend(input_cv: str,
+                  role: str,
+                  n: int,
+                  syn: dict[str, str],
+                  role_tech_dist: dict) -> Recommend:
+    cv_text = get_clean_text(input_cv)
+    cv_words = cv_text.split()
+
+    if role not in role_tech_dist:
+        return Recommend(recommend=[{
+        "learned": [],
+        "to_learn": []
+    }])
+
+    all_techs = syn.keys()
+    role_techs = role_tech_dist[role]
+    learned = set()
+    to_learn = set()
+
+    for tech in all_techs:
+        tech_cleaned = get_clean_text(tech)
+        true_name = syn[tech]
+
+        if has_rus(true_name) or true_name not in role_techs:
+            continue
+
+        if len(tech_cleaned.split()) > 1:
+            if tech_cleaned in cv_text:
+                learned.add(true_name)
+            else:
+                to_learn.add(true_name)
+        else:
+            if tech_cleaned in cv_words:
+                learned.add(true_name)
+            else:
+                to_learn.add(true_name)
+
+    print("LEARNED")
+    print(learned)
+    print("TO_LEARN")
+    print(to_learn)
+    to_learn = to_learn - learned
+
+    learned_dist = [(tech, role_tech_dist[role][tech]) for tech in learned]
+    to_learn_dist = [(tech, role_tech_dist[role][tech]) for tech in to_learn]
+
+    learned_dist = sorted(learned_dist, key=lambda p: -p[1])
+    to_learn_dist = sorted(to_learn_dist, key=lambda p: -p[1])
+
+    learned_ans = list(map(lambda x: x[0], learned_dist[:min(n, len(learned_dist))]))
+    to_learn_ans = list(map(lambda x: x[0], to_learn_dist[:min(n, len(to_learn_dist))]))
+
+    return Recommend(recommend=[{
+        "learned": learned_ans,
+        "to_learn": to_learn_ans
+    }])
+
+
+
+def get_recommend_cv(input_cv: str, role: str, n: int, syn: dict[str, str]) -> Recommend:
+    cv_text = get_clean_text(input_cv)
+    cv_words = cv_text.split()
     techs_freq = []
     known_techs = []
     to_know_techs = []
@@ -90,7 +150,7 @@ def get_recommend_cv(input_cv: str, role: str, n: int, postgres_pool: SimpleConn
     if connection:
         print("Connection is established")
         cursor = connection.cursor()
-        cursor.execute('SELECT * FROM technology_position')
+        cursor.execute('SELECT name_technology, name_position, distance FROM technology_position')
         for elem in cursor:
             row = Row(*elem)
             if not has_rus(row.name_technology) and row.name_position == role:
