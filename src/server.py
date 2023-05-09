@@ -3,11 +3,11 @@ import psycopg2
 from psycopg2.pool import SimpleConnectionPool
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
-from .search_runtime.searchplay import get_search_engine, check_possible_prof
-from .search_runtime.search_engine import SearchEngine
-from .cv_analyze.recommend_cv_role import Recommend, CV, get_recommend
-from .cv_analyze.load_data import load_synonyms, load_freq
-from .backward_search.recommend import get_recommend_tech
+from src.search_runtime.searchplay import get_search_engine, check_possible_prof
+from src.search_runtime.search_engine import SearchEngine
+from src.cv_analyze.recommend_cv_role import Recommend, CV, get_recommend
+from src.cv_analyze.load_data import load_synonyms, load_freq, get_role_techs
+from src.backward_search.recommend import get_recommend_tech
 from src.data import read_data_paths_params
 
 
@@ -20,6 +20,7 @@ SEARCH_ENGINE: SearchEngine
 CONNECTION_POOL: SimpleConnectionPool
 TECH_SYN = {}  # bad_name -> good name
 ROLE_TECH_FREQ = {}
+ROLE_TECHS = set()
 API_PREFIX = "/api/v3"
 THRESHOLD = 0.08
 
@@ -49,9 +50,10 @@ def get_connection_pool():
 
 @app.on_event("startup")
 def load_syn():
-    global TECH_SYN, ROLE_TECH_FREQ
+    global TECH_SYN, ROLE_TECH_FREQ, ROLE_TECHS
     TECH_SYN = load_synonyms(CONNECTION_POOL)
     ROLE_TECH_FREQ = load_freq(CONNECTION_POOL, TECH_SYN)
+    ROLE_TECHS = get_role_techs(ROLE_TECH_FREQ)
 
 
 @app.get("/")
@@ -71,7 +73,7 @@ async def search(query: str) -> dict[str, str]:
 
 @app.get(API_PREFIX+"/tech_search/{query}")
 async def backward_search(query: str, n:int = 5) -> dict[str, list[str]]:
-    result = get_recommend_tech(query, n, TECH_SYN)
+    result = get_recommend_tech(query, n, TECH_SYN, ROLE_TECHS)
     return {"techs": result}
 
 

@@ -20,7 +20,7 @@ def load_synonyms(postgres_pool: SimpleConnectionPool) -> dict[str, str]:
         print("Error creation connection")
     return syn
 
-def load_freq(postgres_pool: SimpleConnectionPool, synUPD: dict[str, str]) -> dict:
+def load_freq(postgres_pool: SimpleConnectionPool, syn_upd: dict[str, str]) -> dict:
     freq = defaultdict(dict)
     connection = postgres_pool.getconn()
     if connection:
@@ -30,11 +30,18 @@ def load_freq(postgres_pool: SimpleConnectionPool, synUPD: dict[str, str]) -> di
         for elem in cursor:
             tech, role, dist = elem[0], elem[1], elem[2]
             freq[role][tech] = float(dist)
-            synUPD[tech] = tech
+            syn_upd[tech] = tech
         cursor.close()
         postgres_pool.putconn(connection)
         print("PostgreSQL connection is returned to the pool")
     else:
         print("Error creation connection")
     return freq
+
+def get_role_techs(role_tech_dist: dict) -> set[str]:
+    role_techs = set()
+    for role in role_tech_dist:
+        techs = role_tech_dist[role].keys()
+        role_techs |= set(techs)
+    return role_techs
 

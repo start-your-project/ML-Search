@@ -8,7 +8,7 @@ class TechSynRow():
     bad_name: str
     true_name: str
 
-def get_recommend_tech(input: str, n: int, syn_bad_good: dict) -> list[str]:
+def get_recommend_tech(input: str, n: int, syn_bad_good: dict, role_techs: set) -> list[str]:
     result = []
     input_norm = get_clean_text(input)
     used_tech = set()
@@ -23,6 +23,8 @@ def get_recommend_tech(input: str, n: int, syn_bad_good: dict) -> list[str]:
     result_good_names = [syn_bad_good[bad_name] for bad_name in result_bad_names]
     ans = []
     for elem in result_good_names:
+        if elem not in role_techs:
+            continue
         if elem not in ans:
             ans.append(elem)
         if len(ans) == n:
