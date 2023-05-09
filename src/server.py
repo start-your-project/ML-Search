@@ -61,8 +61,9 @@ async def root():
     return "Search service by @FedorX8"
 
 
-@app.get(API_PREFIX+"/role_search/{query}")
+@app.get(API_PREFIX+"/role_search/")
 async def search(query: str) -> dict[str, str]:
+    print(f"GET query {query}")
     profession = SEARCH_ENGINE.search(query)
     if not profession:
         if check_possible_prof(query):
@@ -71,13 +72,13 @@ async def search(query: str) -> dict[str, str]:
     return {"profession": profession, "in_base": 1}
 
 
-@app.get(API_PREFIX+"/tech_search/{query}")
+@app.get(API_PREFIX+"/tech_search/")
 async def backward_search(query: str, n:int = 5) -> dict[str, list[str]]:
     result = get_recommend_tech(query, n, TECH_SYN, ROLE_TECHS)
     return {"techs": result}
 
 
-@app.get(API_PREFIX+"/recommend/{query}")
+@app.get(API_PREFIX+"/recommend/")
 async def recommend(query: str, n: int = 5) -> dict[str, list[str]]:
     professions = SEARCH_ENGINE.recommend(query, n)
     if not professions:
