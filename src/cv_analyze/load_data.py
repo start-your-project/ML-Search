@@ -12,15 +12,12 @@ def load_synonyms(postgres_pool: SimpleConnectionPool) -> dict[str, str]:
         for elem in cursor:
             bad_name, true_name = elem[1], elem[2]
             syn[bad_name] = true_name
+            syn[true_name] = true_name
         cursor.close()
         postgres_pool.putconn(connection)
         print("PostgreSQL connection is returned to the pool")
     else:
         print("Error creation connection")
-
-    vals = list(syn.values())
-    for elem in vals:
-        syn[elem] = elem
     return syn
 
 def load_freq(postgres_pool: SimpleConnectionPool, synUPD: dict[str, str]) -> dict:

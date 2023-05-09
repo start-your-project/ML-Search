@@ -71,7 +71,7 @@ async def search(query: str) -> dict[str, str]:
 
 @app.get(API_PREFIX+"/tech_search/{query}")
 async def backward_search(query: str, n:int = 5) -> dict[str, list[str]]:
-    result = get_recommend_tech(query, n, CONNECTION_POOL)
+    result = get_recommend_tech(query, n, TECH_SYN)
     return {"techs": result}
 
 
@@ -85,7 +85,6 @@ async def recommend(query: str, n: int = 5) -> dict[str, list[str]]:
 
 @app.post(API_PREFIX+"/cv_analyze")
 async def get_cv_recommendation(cv: CV) -> Recommend:
-    #result = get_recommend_cv(cv.cv_text, cv.role, cv.n_tech, CONNECTION_POOL)
     result = get_recommend(cv.cv_text, cv.role, cv.n_tech, TECH_SYN, ROLE_TECH_FREQ)
     if result.empty():
         raise HTTPException(status_code=404, detail="No such role")

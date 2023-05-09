@@ -1,6 +1,4 @@
-from psycopg2.pool import SimpleConnectionPool
 from pydantic import BaseModel
-from dataclasses import dataclass
 import re
 
 
@@ -19,15 +17,6 @@ class Recommend(BaseModel):
             sum_n += len(self.recommend[0][key])
         return sum_n == 0
 
-@dataclass
-class Row():
-    id_technology: int
-    name_technology: str
-    id_position: int
-    name_position: str
-    distance: float
-    professionalism: float
-
 
 def has_rus(text: str) -> bool:
     txt = re.findall('[А-яёЁ]+', text)
@@ -42,51 +31,12 @@ def get_clean_text(text: str) -> str:
     return text
 
 
-def get_learned(cv_words: list[str], techs: list[tuple[str, float]], n: int = 5) -> list[str]:
-    result = []
-    for tech, freq in techs:
-        tech_words = get_clean_text(tech).split()
-        if len(tech_words) == 1:
-            if get_clean_text(tech) in cv_words:
-                result.append((tech, freq))
-        else:
-            for tech_w in tech_words:
-                if tech_w not in cv_words:
-                    break
-            else:
-                result.append((tech, freq))
-    result = sorted(result, key=lambda x: x[1], reverse=True)
-    techs = list(map(lambda x: x[0], result))
-    n = min(n, len(techs))
-    return techs[:n]
-
-def get_to_learn(cv_words: list[str], techs: list[tuple[str, float]], n: int = 5) -> list[str]:
-    result = []
-    for tech, freq in techs:
-        tech_words = get_clean_text(tech).split()
-        if len(tech_words) == 1:
-            if get_clean_text(tech) not in cv_words:
-                result.append((tech, freq))
-        else:
-            for tech_w in tech_words:
-                if tech_w in cv_words:
-                    break
-            else:
-                result.append((tech, freq))
-
-    result = sorted(result, key=lambda x: x[1], reverse=True)
-    techs = list(map(lambda x: x[0], result))
-    n = min(n, len(techs))
-    return techs[:n]
-
-
 def get_recommend(input_cv: str,
                   role: str,
                   n: int,
                   syn: dict[str, str],
                   role_tech_dist: dict) -> Recommend:
-    cv_text = get_clean_text(input_cv)
-    cv_words = cv_text.split()
+    cv_text = " " + get_clean_text(input_cv) + " "
 
     if role not in role_tech_dist:
         return Recommend(recommend=[{
@@ -94,43 +44,44 @@ def get_recommend(input_cv: str,
         "to_learn": []
     }])
 
-    all_techs = syn.keys()
-    role_techs = role_tech_dist[role]
-    learned = set()
-    to_learn = set()
+    role_techs = role_tech_dist[role].keys()
+    learned = list()
+    to_learn = list()
 
-    for tech in all_techs:
-        tech_cleaned = get_clean_text(tech)
-        true_name = syn[tech]
-
-        if has_rus(true_name) or true_name not in role_techs:
-            continue
-
-        if len(tech_cleaned.split()) > 1:
-            if tech_cleaned in cv_text:
-                learned.add(true_name)
-            else:
-                to_learn.add(true_name)
+    for tech in role_techs:
+        if " "+get_clean_text(tech)+" " in cv_text:
+            learned.append(tech)
         else:
-            if tech_cleaned in cv_words:
-                learned.add(true_name)
-            else:
-                to_learn.add(true_name)
+            to_learn.append(tech)
+    used_techs = []
+    learned_ans = []
+    to_learn_ans = []
+    for tech in learned:
+        if tech in syn:
+            new_tech = syn[tech]
+        else:
+            new_tech = tech
+        if get_clean_text(tech) not in used_techs:
+            learned_ans.append((new_tech, role_tech_dist[role][tech]))
+            used_techs.append(get_clean_text(new_tech))
+    for tech in to_learn:
+        if has_rus(tech):
+            continue
+        if tech in syn:
+            new_tech = syn[tech]
+        else:
+            new_tech = tech
+        if get_clean_text(tech) not in used_techs:
+            to_learn_ans.append((new_tech, role_tech_dist[role][tech]))
+            used_techs.append(get_clean_text(new_tech))
 
-    print("LEARNED")
-    print(learned)
-    print("TO_LEARN")
-    print(to_learn)
-    to_learn = to_learn - learned
+    to_learn_ans = sorted(to_learn_ans, key=lambda x: -x[1])
+    learned_ans = sorted(learned_ans, key=lambda x: -x[1])
+    print(to_learn_ans[:10])
+    print(learned_ans[:10])
 
-    learned_dist = [(tech, role_tech_dist[role][tech]) for tech in learned]
-    to_learn_dist = [(tech, role_tech_dist[role][tech]) for tech in to_learn]
-
-    learned_dist = sorted(learned_dist, key=lambda p: -p[1])
-    to_learn_dist = sorted(to_learn_dist, key=lambda p: -p[1])
-
-    learned_ans = list(map(lambda x: x[0], learned_dist[:min(n, len(learned_dist))]))
-    to_learn_ans = list(map(lambda x: x[0], to_learn_dist[:min(n, len(to_learn_dist))]))
+    learned_ans = list(map(lambda x: x[0], learned_ans[:min(n, len(to_learn_ans))]))
+    to_learn_ans = list(map(lambda x: x[0], to_learn_ans[:min(n, len(to_learn_ans))]))
 
     return Recommend(recommend=[{
         "learned": learned_ans,
@@ -138,34 +89,3 @@ def get_recommend(input_cv: str,
     }])
 
 
-
-def get_recommend_cv(input_cv: str, role: str, n: int, syn: dict[str, str]) -> Recommend:
-    cv_text = get_clean_text(input_cv)
-    cv_words = cv_text.split()
-    techs_freq = []
-    known_techs = []
-    to_know_techs = []
-
-    connection = postgres_pool.getconn()
-    if connection:
-        print("Connection is established")
-        cursor = connection.cursor()
-        cursor.execute('SELECT name_technology, name_position, distance FROM technology_position')
-        for elem in cursor:
-            row = Row(*elem)
-            if not has_rus(row.name_technology) and row.name_position == role:
-                techs_freq.append((row.name_technology, row.distance))
-        if techs_freq:
-            print(f"techs freq: {techs_freq}")
-            known_techs = get_learned(cv_words, techs_freq, n)
-            to_know_techs = get_to_learn(cv_words, techs_freq, n)
-
-        cursor.close()
-        postgres_pool.putconn(connection)
-        print("PostgreSQL connection is returned to the pool")
-    else:
-        print("Error creation connection")
-    return Recommend(recommend=[{
-        "learned": known_techs,
-        "to learn": to_know_techs
-    }])
