@@ -1,5 +1,5 @@
 from Levenshtein import distance
-from src.cv_analyze.recommend_cv_role import get_clean_text
+from src.cv_analyze.recommend_cv_role import get_clean_text, has_rus
 from dataclasses import dataclass
 
 @dataclass
@@ -13,9 +13,9 @@ def get_recommend_tech(input: str, n: int, syn_bad_good: dict) -> list[str]:
     input_norm = get_clean_text(input)
     used_tech = set()
     for bad_name in set(syn_bad_good.keys()):
-        if bad_name not in used_tech:
+        if get_clean_text(bad_name) not in used_tech and not has_rus(bad_name):
             result.append((bad_name, distance(input_norm, get_clean_text(bad_name))))
-            used_tech.add(bad_name)
+            used_tech.add(get_clean_text(bad_name))
     result = list(set(result))
     n = min(n, len(result))
     result = sorted(result, key=lambda x: x[1])
