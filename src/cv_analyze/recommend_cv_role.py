@@ -57,6 +57,8 @@ def get_recommend(input_cv: str,
     learned_ans = []
     to_learn_ans = []
     for tech in learned:
+        if tech == "Ozone":
+            continue
         if tech in syn:
             new_tech = syn[tech]
         else:
@@ -79,6 +81,8 @@ def get_recommend(input_cv: str,
     learned_ans = sorted(learned_ans, key=lambda x: -x[1])
     print(to_learn_ans[:10])
     print(learned_ans[:10])
+    if to_learn_ans[0][0] == "Ozone":
+        del to_learn_ans[0]
 
     learned_ans = list(map(lambda x: x[0], learned_ans[:min(n, len(to_learn_ans))]))
     to_learn_ans = list(map(lambda x: x[0], to_learn_ans[:min(n, len(to_learn_ans))]))
