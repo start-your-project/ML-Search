@@ -22,8 +22,9 @@ def get_recommend_tech(input: str, n: int, syn_bad_good: dict, role_techs: set) 
     result_bad_names = list(map(lambda x: x[0], result))
     result_good_names = [syn_bad_good[bad_name] for bad_name in result_bad_names]
     ans = []
+    bad_names = ["java script"]
     for elem in result_good_names:
-        if elem not in role_techs:
+        if elem not in role_techs or elem.lower() in bad_names:
             continue
         if elem not in ans:
             ans.append(elem)

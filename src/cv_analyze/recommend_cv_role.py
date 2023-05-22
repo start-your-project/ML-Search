@@ -56,8 +56,9 @@ def get_recommend(input_cv: str,
     used_techs = []
     learned_ans = []
     to_learn_ans = []
+    learned_bad = ["ozone", "москва"]
     for tech in learned:
-        if tech == "Ozone":
+        if tech.lower() in learned_bad:
             continue
         if tech in syn:
             new_tech = syn[tech]
